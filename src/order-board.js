@@ -1,4 +1,5 @@
 import uuid from 'uuid/v4';
+import Big from 'big.js';
 import { BUY, SELL } from './OrderTypes';
 
 
@@ -21,7 +22,9 @@ export default function orderBoard() {
 
     orders[order.type].set(id, {
       ...order,
-      id
+      id,
+      qty: Big(order.qty),
+      price: Big(order.price)
     });
 
     update();
@@ -47,8 +50,8 @@ export default function orderBoard() {
     if (!observer) return;
 
     const summary = {
-      [BUY]: Array.from(orders[BUY].values()),
-      [SELL]: Array.from(orders[SELL].values())
+      [BUY]: aggregate(orders[BUY].values(), priceDesc),
+      [SELL]: aggregate(orders[SELL].values(), priceAsc)
     };
 
     observer.next(summary);
@@ -56,3 +59,31 @@ export default function orderBoard() {
 
   return board;
 }
+
+
+function aggregate(orders, sort) {
+  const priceMap = new Map();
+
+  Array.from(orders).forEach((order) => {
+    const priceKey = order.price.toFixed(2);
+    if (priceMap.has(priceKey)) {
+      priceMap.set(priceKey, {
+        price: order.price,
+        qty: priceMap.get(priceKey).qty.plus(order.qty)
+      });
+    } else {
+      priceMap.set(priceKey, {
+        price: order.price,
+        qty: order.qty
+      });
+    }
+  });
+
+  return Array.from(priceMap.values()).sort(sort).map(summaryOrder => ({
+    price: summaryOrder.price.toFixed(2),
+    qty: summaryOrder.qty.toFixed(1)
+  }));
+}
+
+const priceAsc = (a, b) => a.price.minus(b.price);
+const priceDesc = (a, b) => b.price.minus(a.price);

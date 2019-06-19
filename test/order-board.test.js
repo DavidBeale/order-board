@@ -104,35 +104,40 @@ test('Free the board', async (t) => {
 });
 
 
-// test('Aggregate orders by Price', async (t) => {
-//   const board = orderBoard();
-//
-//   const summary = await new Promise((resolve) => {
-//     board.placeOrder({
-//       userId: 4,
-//       type: BUY,
-//       qty: '3.5',
-//       price: '303.00'
-//     });
-//
-//     board.placeOrder({
-//       userId: 7,
-//       type: BUY,
-//       qty: '1.5',
-//       price: '306.00'
-//     });
-//
-//     board.subscribe((summary) => {
-//       resolve(summary);
-//     });
-//
-//     board.placeOrder({
-//       userId: 2,
-//       type: BUY,
-//       qty: '1.5',
-//       price: '303.00'
-//     });
-//   });
-//
-//   t.is(summary.length, 2);
-// });
+test('Aggregate orders by Price', async (t) => {
+  const board = orderBoard();
+
+  const summary = await new Promise((resolve) => {
+    board.placeOrder({
+      userId: 4,
+      type: BUY,
+      qty: '3.5',
+      price: '303.00'
+    });
+
+    board.placeOrder({
+      userId: 7,
+      type: BUY,
+      qty: '1.5',
+      price: '306.00'
+    });
+
+    board.subscribe((summary) => {
+      resolve(summary);
+    });
+
+    board.placeOrder({
+      userId: 2,
+      type: BUY,
+      qty: '1.5',
+      price: '303.00'
+    });
+  });
+
+  t.is(summary[BUY].length, 2);
+  t.is(summary[SELL].length, 0);
+  t.deepEqual(summary[BUY], [
+    { price: '306.00', qty: '1.5' },
+    { price: '303.00', qty: '5.0' }
+  ]);
+});
