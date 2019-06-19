@@ -9,6 +9,7 @@ export default function orderBoard() {
     observer = obs;
   });
 
+
   board.placeOrder = (order) => {
     const id = uuid();
 
@@ -18,6 +19,8 @@ export default function orderBoard() {
     });
 
     update();
+
+    return orders.get(id);
   };
 
 
@@ -29,11 +32,14 @@ export default function orderBoard() {
 
   board.free = () => {
     orders.clear();
+    update();
   }
 
 
   function update() {
-    const summary = Array.from(orders);
+    if (!observer) return;
+
+    const summary = Array.from(orders.values());
     observer.next(summary);
   }
 
