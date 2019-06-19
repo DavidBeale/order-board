@@ -1,8 +1,14 @@
 import uuid from 'uuid/v4';
+import { BUY, SELL } from './OrderTypes';
 
+
+export { BUY, SELL } from './OrderTypes';
 
 export default function orderBoard() {
-  const orders = new Map();
+  const orders = {
+    [BUY]: new Map(),
+    [SELL]: new Map()
+  };
   let observer;
 
   const board = new Observable((obs) => {
@@ -13,33 +19,38 @@ export default function orderBoard() {
   board.placeOrder = (order) => {
     const id = uuid();
 
-    orders.set(id, {
+    orders[order.type].set(id, {
       ...order,
       id
     });
 
     update();
 
-    return orders.get(id);
+    return orders[order.type].get(id);
   };
 
 
   board.cancelOrder = (order) => {
-    orders.delete(order.id);
+    orders[order.type].delete(order.id);
     update();
   };
 
 
   board.free = () => {
-    orders.clear();
+    orders[BUY].clear();
+    orders[SELL].clear();
     update();
-  }
+  };
 
 
   function update() {
     if (!observer) return;
 
-    const summary = Array.from(orders.values());
+    const summary = {
+      [BUY]: Array.from(orders[BUY].values()),
+      [SELL]: Array.from(orders[SELL].values())
+    };
+
     observer.next(summary);
   }
 

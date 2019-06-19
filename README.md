@@ -6,17 +6,17 @@ Live Order Board
 
 ```js
 
-import orderBoard from '@bank/order-board';
+import orderBoard, { BUY, SELL } from '@bank/order-board';
 
 const board = orderBoard();
 
 board.subscribe(summary => {
-  console.log(summary)  // Array of order summaries
+  console.log(summary) // -->  { BUY: [order summaries], SELL: [order summaries]}
 })
 
 board.placeOrder({
   userId: 4,
-  type: 'BUY',
+  type: BUY,
   qty: '3.5',
   price: '303.00'
 });
@@ -44,5 +44,5 @@ npm i @bank/order-board
 # Development
 ```shell
 npm i
-npm test
+npm t
 ```
