@@ -38,6 +38,7 @@ board.free();
  - Qty to 1 decimal places
 
 # Improvements
+ - Drive aggregatation from the Observable steam (i.e. subscribe.filter().map etc)
  - Split BUY/SELL subscription to that only one needs to notified at a time (i.e. A Sell order does not change the BUY summary)
  - Use a deeper data-structure to reduce to interations needed per place/cancel operation
 
